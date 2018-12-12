@@ -25,3 +25,7 @@ If you want to build your own images with Docker + `kubeadm` you can do so using
 > ./buildImages.sh <repo> <image-name> <push>
 ```
 The `<repo>` and `<image-name>` arguments are used together with the versions to form a full image tag in the format `<repo>/<name>:<version>`.  The versions which are built are hardcoded into the script currently as a Bash array.  If `<push>` is given any non-zero value the resulting images are also pushed to the selected `<repo>`.
+
+## Future Work
+
+- Refactor scripts to use `getopt` for argument parsing
