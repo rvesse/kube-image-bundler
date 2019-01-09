@@ -34,6 +34,14 @@ for IMAGE in ${IMAGES[@]}; do
   if [ $? -ne 0 ]; then
     error "Failed to pull image ${IMAGE}"
   fi
+
+  IMAGE=${IMAGE##k8s.gcr.io/}
+  TAG=$(echo "${IMAGE}" | cut -d ':' -f 2)
+  IMAGE=${IMAGE%%:${TAG}}
+  if [ "${IMAGE}" == "pause" ]; then
+    docker tag "k8s.gcr.io/${IMAGE}:${TAG}" "k8s.gcr.io/${IMAGE}-amd64:${TAG}"
+    IMAGES+=("k8s.gcr.io/${IMAGE}-amd64:${TAG}")
+  fi
 done
 
 # If this version was previously exported nuke the existing export
