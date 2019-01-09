@@ -29,8 +29,9 @@ function buildAndTagVersion() {
 # Build version specific images
 for VERSION in ${VERSIONS[@]}; do
   SHORT_TAG=$(echo ${VERSION} | awk -F '.' '{print $1 "." $2}')
-  buildAndTagVersion ${VERSION} ${SHORT_TAG}
+  buildAndTagVersion ${VERSION} ${SHORT_TAG} "v${SHORT_TAG}"
 done
 
 # Tag latest image
-docker tag ${REPO}/${NAME}:${VERSIONS[0]} ${REPO}/${NAME}:latest
+set +x
+docker tag ${REPO}/${NAME}:v${VERSIONS[0]} ${REPO}/${NAME}:latest
