@@ -7,4 +7,4 @@ RUN yum install -y docker
 
 # Then install the desired kubeadm version
 ARG KUBE_VERSION
-RUN yum install -y kubeadm-${KUBE_VERSION} docker
+RUN yum install -y kubeadm-${KUBE_VERSION}
