@@ -7,15 +7,21 @@ This repository contains simple scripts and associated Docker image to aid in ob
 Run the `bundle-k8s-images.sh` script passing in the desired Kubernetes version and optionally the `kubeadm` image version to use e.g.
 
 ```
-> ./bundle-k8s-images.sh 1.10.11 v1.11
+> ./bundle-k8s-images.sh -k 1.10.11 -a v1.11
 ```
 Will produce a `k8s_v1.10.11_images.tar` file.
 
-The optional second argument refers to an image that contains Docker + Kubeadm and is used to obtain the images via the `kubeadm config images list` command.
+Where options can be viewed by running with the `-h` option.  Only required option is `-k <k8s-version>` to specify the desired Kubernetes version.
 
-**NB:** This feature of `kubeadm` was only added from 1.11 onwards and `kubeadm` is typically only able to provide images for versions within 1 minor version of it.  Therefore you should use an image version as close to the desired Kubernetes version as possible.
+**NB:** This feature of `kubeadm` was only added from 1.11 onwards and `kubeadm` is typically only able to provide images for versions within 1 minor version of it.  Therefore you should use an image version as close to the desired Kubernetes version as possible.  The `-a <kubeadm-version>` option specifies the desired `kubeadm` image version, if omitted the script selects a version based on the specified `-k <k8s-version>` option which may not be correct when targeting older versions of Kubernetes.
 
 The `kubeadm` image is publicly available on Docker Hub as `rvesse/kubeadm` with various tags covering 1.9 through 1.13.  You can optionally build your own images using the other contents of this repository.
+
+If you need to bundle additional images e.g. for your network overlay or other system services you can use the `-e <image-ref>` option as many times as you want to specify additional images to bundle e.g.
+
+```
+> ./bundle-k8s-images.sh -k 1.10.11 -a 1.11 -e quay.io/romana/agent:v2.0.2 -e quay.io/romana/listener:v2.0.2 -e quay.io/romana/daemon:v2.0.2
+```
 
 ## Building the Docker Image (Optional)
 
@@ -25,7 +31,3 @@ If you want to build your own images with Docker + `kubeadm` you can do so using
 > ./buildImages.sh <repo> <image-name> <push>
 ```
 The `<repo>` and `<image-name>` arguments are used together with the versions to form a full image tag in the format `<repo>/<name>:<version>`.  The versions which are built are hardcoded into the script currently as a Bash array.  If `<push>` is given any non-zero value the resulting images are also pushed to the selected `<repo>`.
-
-## Future Work
-
-- Refactor scripts to use `getopt` for argument parsing
