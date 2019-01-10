@@ -32,7 +32,7 @@ If you want to build your own images with Docker + `kubeadm` you can do so using
 ```
 The `<repo>` and `<image-name>` arguments are used together with the versions to form a full image tag in the format `<repo>/<name>:<version>`.
 
-The default versions which are built are hardcoded into the script as a Bash array.  You can use `-v <version>` option can be used to build images for specified `kubeadm` versions. You can specify `-d` to always include the default list of versions.
+The default versions which are built are hardcoded into the script as a Bash array.  You can use the `-v <version>` option to build images for specified `kubeadm` versions. You can optionally specify `-d` to always include the default list of versions.  If no versions are explicitly specified then the default list will be used.
 
 If `-p` is given then the resulting images are also pushed to the selected `<repo>`.
 
