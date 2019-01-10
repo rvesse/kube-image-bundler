@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 function showUsage() {
   cat <<EOF
 Kubernetes Image Bundler
@@ -37,7 +35,7 @@ EOF
 KUBE_VERSION=
 KUBEADM_IMAGE_VERSION=
 EXTRA_IMAGES=()
-PARSED_OPTIONS="$(getopt ":k:a:e:h" -- "$@")"
+PARSED_OPTIONS=$(getopt ":k:a:e:h" -- "$@")
 eval set "${PARSED_OPTIONS}"
 while [ $# -gt 0 ]; do
   case "$1" in
