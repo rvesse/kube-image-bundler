@@ -28,6 +28,12 @@ If you need to bundle additional images e.g. for your network overlay or other s
 If you want to build your own images with Docker + `kubeadm` you can do so using the `Dockerfile` provided here.  The provided `buildImages.sh` script will build images for all recent `kubeadm` versions.  The script takes three arguments:
 
 ```
-> ./buildImages.sh <repo> <image-name> <push>
+> ./buildImages.sh -r <repo> -n <image-name> -p
 ```
-The `<repo>` and `<image-name>` arguments are used together with the versions to form a full image tag in the format `<repo>/<name>:<version>`.  The versions which are built are hardcoded into the script currently as a Bash array.  If `<push>` is given any non-zero value the resulting images are also pushed to the selected `<repo>`.
+The `<repo>` and `<image-name>` arguments are used together with the versions to form a full image tag in the format `<repo>/<name>:<version>`.
+
+The default versions which are built are hardcoded into the script as a Bash array.  You can use `-v <version>` option can be used to build images for specified `kubeadm` versions. You can specify `-d` to always include the default list of versions.
+
+If `-p` is given then the resulting images are also pushed to the selected `<repo>`.
+
+You can use `-l <version>` to specify that a specific version should also be tagged as `latest`.
