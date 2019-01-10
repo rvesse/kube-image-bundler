@@ -8,6 +8,9 @@ Kubeadm Image Builder
 
 Where OPTIONS are as follows:
 
+  -d                   Specifies that the default versions list will be used in addition
+                       to any -v <version> options specified
+
   -h                   Displays this help and exits
 
   -l <latest-version>  Specifies the version of kubeadm to tag as latest
@@ -29,11 +32,16 @@ REPO=
 NAME=
 PUSH=
 LATEST=
+DEFAULT_VERSIONS=
 VERSIONS=()
-PARSED_OPTIONS=$(getopt "r:n:l:v:ph" -- "$@")
+PARSED_OPTIONS=$(getopt "r:n:l:v:phd" -- "$@")
 eval set "${PARSED_OPTIONS}"
 while [ $# -gt 0 ]; do
   case "$1" in
+    -d)
+      DEFAULT_VERSIONS="true"
+      shift
+      ;;
     -h)
       showUsage
       exit 0
@@ -85,9 +93,9 @@ if [ -z "${REPO}" ]; then
   echo "Required repository option -r <repo> was not set"
   exit 1
 fi
-if [ "${#VERSIONS[@]}" -eq 0 ]; then
-  echo "No -v <version> options specified so using default version list: ${VERSIONS[@]}"
+if [ "${#VERSIONS[@]}" -eq 0 -o -n "${DEFAULT}" ]; then
   VERSIONS=("1.13.0" "1.12.3" "1.11.5" "1.10.11" "1.9.11")
+  echo "Including default version list: ${VERSIONS[@]}"
 fi
 
 function buildAndTagVersion() {
