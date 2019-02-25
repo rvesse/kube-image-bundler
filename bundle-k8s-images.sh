@@ -90,21 +90,34 @@ function error() {
   exit ${EXIT_CODE}
 }
 
+function listImages() {
+  while [ $# -gt 0 ];
+  do
+    echo $1
+    shift
+  done
+}
+
 # Obtain the K8S images list
 IMAGES=$(docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rvesse/kubeadm:${KUBEADM_IMAGE_VERSION} kubeadm config images list --kubernetes-version ${KUBE_VERSION})
 if [ $? -ne 0 ]; then
   error "Failed to list K8S images"
 fi
 IMAGES=($IMAGES)
-echo "Found ${#IMAGES[@]} images to bundle"
+echo "Found ${#IMAGES[@]} images to bundle:"
 if [ "${#IMAGES[@]}" -eq 0 ]; then
   error "Failed to detect any K8S images"
   exit 1
+else
+  listImages ${IMAGES[@]}
 fi
 if [ "${#EXTRA_IMAGES[@]}" -gt 0 ]; then
-  echo "Will bundle ${#EXTRA_IMAGES[@]} extra images: ${EXTRA_IMAGES[@]}"
+  echo "Will bundle ${#EXTRA_IMAGES[@]} extra images:"
+  listImages ${EXTRA_IMAGES[@]}
   IMAGES+=("${EXTRA_IMAGES[@]}")
 fi
+
+echo ""
 
 # Pull the desired images
 for IMAGE in ${IMAGES[@]}; do
