@@ -15,6 +15,10 @@ Where OPTIONS are as follows:
 
   -e <image-ref>             Specifies extra images to bundle
 
+  -f <features-gates>        Specifies a comma separated list of key value pairs that are passed to
+                             kubeadm via the --feature-gates flag as feature gates may affect the list
+                             of images you need to bundle
+
   -h                         Shows this help and exits
 
   -k <k8s-version>           Specifies the version of Kubernetes to bundle images for
@@ -29,6 +33,10 @@ NB - kubeadm only supports listing the relevant images with 1.11 and higher.  Ad
 
        ./bundle-k8s-images.sh -a 1.11 -k 1.10.11
 
+     Bundling images to use the old kube-dns DNS provider:
+
+       ./bundle-k8s-images.sh -a 1.11 -k 1.10.11 -f CoreDNS=false
+
      Or:
 
        ./bundle-k8s-images.sh -k 1.12.3
@@ -38,7 +46,8 @@ EOF
 KUBE_VERSION=
 KUBEADM_IMAGE_VERSION=
 EXTRA_IMAGES=()
-PARSED_OPTIONS=$(getopt ":k:a:e:hd" -- "$@")
+FEATURE_GATES=
+PARSED_OPTIONS=$(getopt ":k:a:e:f:hd" -- "$@")
 eval set "${PARSED_OPTIONS}"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -64,6 +73,14 @@ while [ $# -gt 0 ]; do
         exit 1
       fi
       EXTRA_IMAGES+=("$2")
+      shift 2
+      ;;
+    -f)
+      if [ -z "$2" ]; then
+        echo "Option -f requires a comma separated list of feature gates to be specified"
+        exit 1
+      fi
+      FEATURE_GATES=$2
       shift 2
       ;;
     -h)
@@ -106,7 +123,11 @@ function listImages() {
 }
 
 # Obtain the K8S images list
-IMAGES=$(docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rvesse/kubeadm:${KUBEADM_IMAGE_VERSION} kubeadm config images list --kubernetes-version ${KUBE_VERSION})
+KUBEADM_COMMAND="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rvesse/kubeadm:${KUBEADM_IMAGE_VERSION} kubeadm config images list --kubernetes-version ${KUBE_VERSION}"
+if [ -n "${FEATURE_GATES}" ]; then
+  KUBEADM_COMMAND="${KUBEADM_COMMAND} --feature-gates ${FEATURE_GATES}"
+fi
+IMAGES=$(${KUBEADM_COMMAND})
 if [ $? -ne 0 ]; then
   error "Failed to list K8S images"
 fi
