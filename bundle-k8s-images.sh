@@ -10,6 +10,9 @@ Where OPTIONS are as follows:
 
   -a <kubeadm-version>       Specifies the version of kubeadm image to use
 
+  -d                         Specifies debug mode, displays all commands being run by this
+                             script
+
   -e <image-ref>             Specifies extra images to bundle
 
   -h                         Shows this help and exits
@@ -35,7 +38,7 @@ EOF
 KUBE_VERSION=
 KUBEADM_IMAGE_VERSION=
 EXTRA_IMAGES=()
-PARSED_OPTIONS=$(getopt ":k:a:e:h" -- "$@")
+PARSED_OPTIONS=$(getopt ":k:a:e:hd" -- "$@")
 eval set "${PARSED_OPTIONS}"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -66,6 +69,10 @@ while [ $# -gt 0 ]; do
     -h)
       showUsage
       exit 0
+      ;;
+    -d)
+      set -x
+      shift
       ;;
     *)
       echo "Unexpected option $1"
