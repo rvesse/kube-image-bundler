@@ -15,6 +15,8 @@ Where options can be viewed by running with the `-h` option.  Only required opti
 
 **NB:** This feature of `kubeadm` was only added from 1.11 onwards and `kubeadm` is typically only able to provide images for versions within 1 minor version of it.  Therefore you should use an image version as close to the desired Kubernetes version as possible.  The `-a <kubeadm-version>` option specifies the desired `kubeadm` image version, if omitted the script selects a version based on the specified `-k <k8s-version>` option which may not be correct when targeting older versions of Kubernetes.
 
+**WARNING:** We have observed cases where the set of bundled images is not sufficient to run Kubernetes fully e.g. missing sidecar images.  It is unclear if this is a bug in `kubeadm` itself or a side-effect of specific K8S configuration choices we have made.
+
 The `kubeadm` image is publicly available on Docker Hub as `rvesse/kubeadm` with various tags covering 1.9 through 1.13.  You can optionally build your own images using the other contents of this repository.
 
 If you need to bundle additional images e.g. for your network overlay or other system services you can use the `-e <image-ref>` option as many times as you want to specify additional images to bundle e.g.
