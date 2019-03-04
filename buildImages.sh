@@ -29,7 +29,7 @@ EOF
 }
 
 REPO=
-NAME=
+NAME="kubeadm"
 PUSH=
 LATEST=
 DEFAULT_VERSIONS=
@@ -94,7 +94,7 @@ if [ -z "${REPO}" ]; then
   exit 1
 fi
 if [ "${#VERSIONS[@]}" -eq 0 -o -n "${DEFAULT}" ]; then
-  VERSIONS=("1.13.0" "1.12.3" "1.11.5" "1.10.11" "1.9.11")
+  VERSIONS=("1.13.4" "1.12.6" "1.11.8" "1.10.13" "1.9.11")
   echo "Including default version list: ${VERSIONS[@]}"
 fi
 
