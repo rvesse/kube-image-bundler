@@ -94,7 +94,7 @@ if [ -z "${REPO}" ]; then
   exit 1
 fi
 if [ "${#VERSIONS[@]}" -eq 0 -o -n "${DEFAULT}" ]; then
-  VERSIONS=("1.13.4" "1.12.6" "1.11.8" "1.10.13" "1.9.11")
+  VERSIONS=("1.14.0" "1.13.5" "1.12.7" "1.11.9" "1.10.13" "1.9.11")
   echo "Including default version list: ${VERSIONS[@]}"
 fi
 
