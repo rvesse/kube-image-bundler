@@ -19,6 +19,8 @@ Where OPTIONS are as follows:
                              kubeadm via the --feature-gates flag as feature gates may affect the list
                              of images you need to bundle
 
+  -g                         Specifies that the resulting bundle should be gzipped
+
   -h                         Shows this help and exits
 
   -k <k8s-version>           Specifies the version of Kubernetes to bundle images for
@@ -47,7 +49,8 @@ KUBE_VERSION=
 KUBEADM_IMAGE_VERSION=
 EXTRA_IMAGES=()
 FEATURE_GATES=
-PARSED_OPTIONS=$(getopt ":k:a:e:f:hd" -- "$@")
+GZIP=
+PARSED_OPTIONS=$(getopt ":k:a:e:f:hdg" -- "$@")
 eval set "${PARSED_OPTIONS}"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -89,6 +92,10 @@ while [ $# -gt 0 ]; do
       ;;
     -d)
       set -x
+      shift
+      ;;
+    -g)
+      GZIP=true
       shift
       ;;
     *)
@@ -178,4 +185,14 @@ docker save -o "${EXPORT_FILE}" "${IMAGES[@]}"
 if [ $? -ne 0 ]; then
   error "Failed to save K8S images"
 fi
+
+# GZip if requested
+if [ -n "${GZIP}" ]; then
+  echo "Compressing bundle with GZip..."
+  ls -lh "${EXPORT_FILE}"
+  gzip "${EXPORT_FILE}"
+  EXPORT_FILE="${EXPORT_FILE}.gz"
+  ls -lh "${EXPORT_FILE}"
+fi
+
 echo "Docker images exported as ${PWD}/${EXPORT_FILE}"
