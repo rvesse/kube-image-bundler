@@ -11,6 +11,8 @@ Where OPTIONS are as follows:
   -d                   Specifies that the default versions list will be used in addition
                        to any -v <version> options specified
 
+  --dry-run            Show what Docker commands would be run but don't run them
+
   -h                   Displays this help and exits
 
   -l <latest-version>  Specifies the version of kubeadm to tag as latest
@@ -33,6 +35,7 @@ NAME="kubeadm"
 PUSH=
 LATEST=
 DEFAULT_VERSIONS=
+DOCKER="docker"
 VERSIONS=()
 PARSED_OPTIONS=$(getopt "r:n:l:v:phd" -- "$@")
 eval set "${PARSED_OPTIONS}"
@@ -40,6 +43,10 @@ while [ $# -gt 0 ]; do
   case "$1" in
     -d)
       DEFAULT_VERSIONS="true"
+      shift
+      ;;
+    --dry-run)
+      DOCKER="echo ${DOCKER}"
       shift
       ;;
     -h)
@@ -90,30 +97,31 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "${REPO}" ]; then
-  echo "Required repository option -r <repo> was not set"
-  exit 1
+  REPO=${USER}
+  echo "Repository option -r <repo> was not set, defaulting to ${REPO}"
 fi
-if [ "${#VERSIONS[@]}" -eq 0 -o -n "${DEFAULT}" ]; then
-  VERSIONS=("1.15.3" "1.14.6" "1.13.10" "1.12.9" "1.11.9" "1.10.13" "1.9.11")
-  echo "Including default version list: ${VERSIONS[@]}"
+if [ "${#VERSIONS[@]}" -eq 0 -o -n "${DEFAULT_VERSIONS}" ]; then
+  DEFAULT_VERSIONS=("1.15.3" "1.14.6" "1.13.10" "1.12.9" "1.11.9" "1.10.13" "1.9.11")
+  echo "Including default version list: ${DEFAULT_VERSIONS[@]}"
+  VERSIONS+=( ${DEFAULT_VERSIONS[@]} )
 fi
 
 function buildAndTagVersion() {
   local TARGET_VERSION=$1
   shift
   
-  docker build -t ${REPO}/${NAME}:v${TARGET_VERSION} --build-arg KUBE_VERSION=${TARGET_VERSION} docker/
+  ${DOCKER} build -t ${REPO}/${NAME}:v${TARGET_VERSION} --build-arg KUBE_VERSION=${TARGET_VERSION} docker/
 
   if [ -n "${PUSH}" ]; then
-    docker push ${REPO}/${NAME}:v${TARGET_VERSION}
+    ${DOCKER} push ${REPO}/${NAME}:v${TARGET_VERSION}
   fi
 
   if [ $# -gt 0 ]; then
     for TAG in $@; do
-      docker tag ${REPO}/${NAME}:v${TARGET_VERSION} ${REPO}/${NAME}:${TAG}
+      ${DOCKER} tag ${REPO}/${NAME}:v${TARGET_VERSION} ${REPO}/${NAME}:${TAG}
 
       if [ -n "${PUSH}" ]; then
-        docker push ${REPO}/${NAME}:${TAG}
+        ${DOCKER} push ${REPO}/${NAME}:${TAG}
       fi
     done
   fi 
@@ -127,5 +135,5 @@ done
 
 # Tag latest image
 if [ -n "${LATEST}" ]; then
-  docker tag ${REPO}/${NAME}:${LATEST} ${REPO}/${NAME}:latest
+  ${DOCKER} tag ${REPO}/${NAME}:${LATEST} ${REPO}/${NAME}:latest
 fi
