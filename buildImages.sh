@@ -101,7 +101,7 @@ if [ -z "${REPO}" ]; then
   echo "Repository option -r <repo> was not set, defaulting to ${REPO}"
 fi
 if [ "${#VERSIONS[@]}" -eq 0 -o -n "${DEFAULT_VERSIONS}" ]; then
-  DEFAULT_VERSIONS=("1.16.0" "1.15.4" "1.14.7" "1.13.11" "1.12.9" "1.11.9" "1.10.13" "1.9.11")
+  DEFAULT_VERSIONS=("1.17.0" "1.16.3" "1.15.6" "1.14.9" "1.13.12" "1.12.9" "1.11.9" "1.10.13" "1.9.11")
   echo "Including default version list: ${DEFAULT_VERSIONS[@]}"
   VERSIONS+=( ${DEFAULT_VERSIONS[@]} )
 fi
